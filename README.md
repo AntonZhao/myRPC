@@ -1,5 +1,10 @@
 ## 实现自己的rpc
 
+参考资料：
+1. https://blog.csdn.net/qq_40856284/category_10138756.html
+2. https://blog.csdn.net/qq_40856284/article/details/107746408
+
+
 ### 第一阶段：初步通信功能，无法注册多端口
 
 模块描述
@@ -73,6 +78,41 @@
 **test-client**
 - TestClient
 
+### 第三阶段：新增NETTY传输
+
+**rpc-common**
+- enumeration
+    - PackageType --- 分为request和response两种包
+    - SerializerCode --- 序列化种类，目前只有JSON
+
+**rpc-core**
+- codec
+    - CommonEncoder
+        - 自定义协议：MagicNumber4 + PackageType4 + SerializerType4 + DataLength4 + DataBytes
+        - CommonEncoder 继承了MessageToByteEncoder 类，把 RpcRequest 或者 RpcResponse 包装成协议包。
+    - CommonDecoder
+        - 继承自 ReplayingDecoder，与 MessageToByteEncoder 相反，用于将收到的字节序列还原为实际对象。
+- netty.client
+    - NettyClient
+    - NettyClientHandler
+- netty.server
+    - NettyServer
+    - NettyServerHandler：用于接收 RpcRequest，并且执行调用，将调用结果返回封装成 RpcResponse 发送出去。
+- serializer
+    - CommonSerializer
+        - 序列化接口：序列化，反序列化，获得该序列化器的编号
+    - JsonSerializer
+- registry
+    - DefaultServiceRegistry
+    - 将包含注册信息的 serviceMap 和 registeredService 都改成了 static ，这样就能保证全局唯一的注册信息，这样在创建 RpcServer 时也就不需要传入了。
+- 之前的RpcClient和RpcServer改成SocketClient和SocketServer
+- 新增RpcClient 和 RpcServer 接口
+
+**test-server**
+- NettyTestServer
+
+**test-client**
+- NettyTestClient
 
 
 
@@ -95,7 +135,3 @@
 
 
 
-
-参考资料：
-1. https://blog.csdn.net/qq_40856284/category_10138756.html
-2. https://blog.csdn.net/qq_40856284/article/details/107746408

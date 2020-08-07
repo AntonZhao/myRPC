@@ -1,4 +1,4 @@
-package com.anton.rpc.server;
+package com.anton.rpc;
 
 import com.anton.rpc.entity.RpcRequest;
 import com.anton.rpc.entity.RpcResponse;

@@ -1,5 +1,7 @@
-package com.anton.rpc.server;
+package com.anton.rpc.socket.server;
 
+import com.anton.rpc.RequestHandler;
+import com.anton.rpc.RpcServer;
 import com.anton.rpc.registry.ServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,11 +22,14 @@ import java.util.concurrent.*;
  * 这里把处理线程和处理逻辑分成了两个类：
  *      RequestHandlerThread 只是一个线程，从ServiceRegistry 获取到提供服务的对象后，就会把 RpcRequest 和服务对象直接交给 RequestHandler 去处理，
  *      反射等过程被放到了 RequestHandler 里。
+ *
+ * 3.
+ * Socket方式远程调用提供者
  */
 
-public class RpcServer {
+public class SokcetServer implements RpcServer {
 
-    private static final Logger logger = LoggerFactory.getLogger(RpcServer.class);
+    private static final Logger logger = LoggerFactory.getLogger(SokcetServer.class);
 
     private final ExecutorService threadPool;
     private static final int CORE_POOL_SIZE = 5;
@@ -36,7 +41,7 @@ public class RpcServer {
 
     private RequestHandler requestHandler = new RequestHandler();
 
-    public RpcServer(ServiceRegistry serviceRegistry) {
+    public SokcetServer(ServiceRegistry serviceRegistry) {
         this.serviceRegistry = serviceRegistry;
         ArrayBlockingQueue<Runnable> workingQueue = new ArrayBlockingQueue<>(BLOCKING_QUEUE_CAPACITY);
         ThreadFactory threadFactory = Executors.defaultThreadFactory();
@@ -51,6 +56,7 @@ public class RpcServer {
      * 2.
      *
      */
+    @Override
     public void start(int port) {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             logger.info("服务器正在启动...");

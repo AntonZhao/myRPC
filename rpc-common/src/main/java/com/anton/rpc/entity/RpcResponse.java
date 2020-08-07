@@ -11,6 +11,8 @@ import lombok.Data;
   */
  @Data
  public class RpcResponse<T> implements Serializable {
+     public RpcResponse() {
+     }
 
      /**
       * 响应状态码
